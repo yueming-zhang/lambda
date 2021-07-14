@@ -1,0 +1,66 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "FirstLambda:HelloWorldFunction (python3.8)",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/FirstLambda/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {},
+                "runtime": "python3.8"
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "API FirstLambda:HelloWorldFunction (python3.8)",
+            "invokeTarget": {
+                "target": "api",
+                "templatePath": "${workspaceFolder}/FirstLambda/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "api": {
+                "path": "/hello",
+                "httpMethod": "get",
+                "payload": {
+                    "json": {}
+                }
+            },
+            "lambda": {
+                "runtime": "python3.8"
+            }
+        },
+        // {
+        //     "name": "Python: PyTest Unit",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "module": "pytest",
+        //     "args": [
+        //         "-v"
+        //     ],
+        //     "pythonPath": "${workspaceFolder}/venv/bin",
+        //     "program": "${workspaceFolder}/tests/unit"
+        // },        
+        // {
+        //     "name": "Debug Tests",
+        //     "type": "python",
+        //     "request": "test",
+        //     "console": "integratedTerminal",
+        //     "justMyCode": false
+        // }        
+
+        {
+            "name": "Python: Module",
+            "type": "python",
+            "request": "test",
+            "module": "pytest",
+            "args": ["--headful","--capture=no", "--html=report.html"],
+            "env": {"AWS_SAM_STACK_NAME":"sam-app"}
+        }
+    ]
+}
