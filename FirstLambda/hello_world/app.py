@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import boto3
 
 # import requests
 
@@ -40,10 +41,21 @@ def lambda_handler(event, context):
 
     print (f'numpy calculation result: {m}')
 
+    s3 = boto3.client('s3')
+    response = s3.list_buckets()
+
+    # Output the bucket names
+    print('Existing buckets:')
+    for bucket in response['Buckets']:
+        print(f'  {bucket["Name"]}')
+
+    bucket_list = [bucket["Name"] for bucket in response['Buckets']]
+
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "message": f"hello world: 123",
+            # "message": f"hello world: 123",
+            "message": bucket_list
             # "location": ip.text.replace("\n", "")
         }),
     }
