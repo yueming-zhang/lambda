@@ -24,6 +24,64 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+
+  # SecuredHelloWorldAPI:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     StageName: Prod
+  #     Auth:
+  #       DefaultAuthorizer: NONE #AWS_IAM 
+  #       ApiKeyRequired: true
+
+
+  SecuredHelloWorldAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true # sets for all methods
+
+  ApiKey: 
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn: [ApiUsagePlan]
+    Properties: 
+      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-apikey"]]
+      Description: "CloudFormation API Key V1"
+      Enabled: true
+      GenerateDistinctId: false
+      Value: abcdefg123456665ffghsdghfgdhfgdh4565
+      StageKeys:
+        - RestApiId: !Ref SecuredHelloWorldAPI
+          StageName: Prod
+
+  ApiUsagePlan:
+    Type: "AWS::ApiGateway::UsagePlan"
+    DependsOn:
+      - SecuredHelloWorldAPIProdStage
+    Properties:
+      ApiStages: 
+        - ApiId: !Ref SecuredHelloWorldAPI
+          Stage: Prod
+      Description: !Join [" ", [{"Ref": "AWS::StackName"}, "usage plan"]]
+      Quota:
+        Limit: 1000
+        Period: MONTH
+      UsagePlanName: !Join ["", [{"Ref": "AWS::StackName"}, "-usage-plan"]]
+
+  ApiUsagePlanKey:
+    Type: "AWS::ApiGateway::UsagePlanKey"
+    DependsOn: 
+      - SecuredHelloWorldAPI
+    Properties:
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref ApiUsagePlan
+
+
+
+
+
+
   HelloWorldFunction1:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -32,11 +90,18 @@ Resources:
       Runtime: python3.8
       Role: arn:aws:iam::334146477851:role/Lambda_FullAccess
       Events:
-        HelloWorld:
+        HelloWorld1:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /hello_1
             Method: get
+            RestApiId: !Ref SecuredHelloWorldAPI
+            # Auth:
+            #   ApiKeyRequired: true
+            # RequestParameters:
+            #   - method.request.header.Authorization
+            #     Required: true
+            #     Caching: true
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -45,7 +110,7 @@ Outputs:
   HelloWorldApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  NewHelloWorldApi:
+  SecuredHelloWorldAPI:
     Description: "API Gateway endpoint URL for Prod stage for the new Hello World function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello_1/"
   HelloWorldFunction:
