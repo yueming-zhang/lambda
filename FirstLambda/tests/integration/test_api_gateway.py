@@ -48,11 +48,27 @@ class TestApiGateway(TestCase):
         self.api_endpoint = api_outputs[0]["OutputValue"]
         print (f'{self.api_endpoint=}')
 
+        # second API: HelloWorldApi_1
+        api_outputs = [output for output in stack_outputs if output["OutputKey"] == "NewHelloWorldApi"]
+        self.assertTrue(api_outputs, f"Cannot find output HelloWorldApi in stack {stack_name}")
+        self.api_endpoint_1 = api_outputs[0]["OutputValue"]
+
+
     def test_api_gateway(self):
         """
         Call the API Gateway endpoint and check the response
         """
         response = requests.get(self.api_endpoint)
+        assert response.status_code == 200
+        self.assertDictEqual(response.json(), {"message": "hello world: 123"})
+        #assert len(response.json()['message']) > 10
+
+    def test_api_gateway_1(self):
+        """
+        Call the API Gateway endpoint and check the response
+        """
+        response = requests.get(self.api_endpoint_1)
+        assert response.status_code == 200
         assert len(response.json()['message']) > 10
-        # self.assertDictEqual(response.json(), {"message": "hello world: 123"})
+        assert len(response.json()['message'][0]) > 10
 

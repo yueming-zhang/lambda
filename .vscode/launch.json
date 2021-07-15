@@ -43,7 +43,7 @@
         //     "args": [
         //         "-v"
         //     ],
-        //     "pythonPath": "${workspaceFolder}/venv/bin",
+        //     "python": "${workspaceFolder}/venv/bin",
         //     "program": "${workspaceFolder}/tests/unit"
         // },        
         // {
