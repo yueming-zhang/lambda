@@ -1,3 +1,4 @@
+wheel
 requests
 numpy
 boto3

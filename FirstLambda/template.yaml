@@ -37,6 +37,8 @@ Resources:
   SecuredHelloWorldAPI:
     Type: AWS::Serverless::Api
     Properties:
+      Name: SecuredHelloWorldAPI
+      Description: SecuredHelloWorldAPI
       StageName: Prod
       Auth:
         ApiKeyRequired: true # sets for all methods
@@ -63,6 +65,9 @@ Resources:
         - ApiId: !Ref SecuredHelloWorldAPI
           Stage: Prod
       Description: !Join [" ", [{"Ref": "AWS::StackName"}, "usage plan"]]
+      Throttle:
+        RateLimit: 50
+        BurstLimit: 10
       Quota:
         Limit: 1000
         Period: MONTH
@@ -112,7 +117,7 @@ Outputs:
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
   SecuredHelloWorldAPI:
     Description: "API Gateway endpoint URL for Prod stage for the new Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello_1/"
+    Value: !Sub "https://${SecuredHelloWorldAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello_1/"
   HelloWorldFunction:
     Description: "Hello World Lambda Function ARN"
     Value: !GetAtt HelloWorldFunction.Arn
