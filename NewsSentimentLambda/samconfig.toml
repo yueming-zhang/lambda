@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "NewsSentiment"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1u4uj0igy7aej"
+s3_prefix = "NewsSentiment"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"

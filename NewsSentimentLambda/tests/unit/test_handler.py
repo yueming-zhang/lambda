@@ -4,10 +4,8 @@ parentdir = f"{pathlib.Path(currentdir).parent.parent.absolute()}/"
 sys.path.insert(0,parentdir)
 
 import json
-
 import pytest
-
-from hello_world import app
+from news_sentiment_app import app
 
 
 @pytest.fixture()
@@ -67,25 +65,9 @@ def apigw_event():
     }
 
 
-def test_lambda_handler(apigw_event, mocker):
+def test_lambda_news_handler(apigw_event, mocker):
 
-    ret = app.lambda_handler(apigw_event, "")
-    data = json.loads(ret["body"])
+    ret = app.lambda_handler({'action':'insert news'}, "")
+    ret = app.lambda_handler({'action':'delete news'}, "")
 
-    assert ret["statusCode"] == 200
-    assert "message" in ret["body"]
-    assert data["message"] == "hello world: 123"
-    # assert "location" in data.dict_keys()
-
-
-def test_lambda_handler_1(apigw_event, mocker):
-
-    ret = app.lambda_handler_1(apigw_event, "")
-    data = json.loads(ret["body"])
-
-    assert ret["statusCode"] == 200
-    assert "message" in ret["body"]
-    assert len(data["message"]) > 10
-    assert len(data['message'][0]) > 10
-    # assert data["message"] == "hello world: 123"
-    # assert "location" in data.dict_keys()
+    assert ret > 0
