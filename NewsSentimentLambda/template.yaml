@@ -29,6 +29,13 @@ Resources:
           Properties:
             Path: /news
             Method: get
+        Schedule:
+          Type: Schedule
+          Properties:
+            Description: Cloudwatch schedule trigger lambda
+            Name: FindNewsScheduler
+            Schedule: rate(5 minutes)       
+            Input: '[{"action":"insert news"}]'
 
   DynamoNewsTable:
     Type: AWS::DynamoDB::Table
