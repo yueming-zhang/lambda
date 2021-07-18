@@ -68,6 +68,21 @@ def apigw_event():
 def test_lambda_news_handler(apigw_event, mocker):
 
     ret = app.lambda_handler({'action':'insert news'}, "")
+    data = json.loads(ret['body'])
+    assert ret['statusCode'] == 200
+    assert data['insert count'] > 0
+
     ret = app.lambda_handler({'action':'delete news'}, "")
 
-    assert ret > 0
+    data = json.loads(ret['body'])
+    assert ret['statusCode'] == 200
+    assert data['delete count'] > 0
+
+
+def test_lambda_news_delete2():    
+    ret = app.lambda_handler({'action':'delete news'}, "")
+    ret = app.lambda_handler({'action':'delete news'}, "")
+    data = json.loads(ret['body'])
+
+    assert ret['statusCode'] == 200
+    assert data['delete count'] == 0

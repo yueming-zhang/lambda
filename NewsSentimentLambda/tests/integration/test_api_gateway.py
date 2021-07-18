@@ -3,6 +3,7 @@ from unittest import TestCase
 
 import boto3
 import requests
+import json
 
 """
 Make sure env variable AWS_SAM_STACK_NAME exists with the name of the stack we are going to test. 
@@ -47,9 +48,30 @@ class TestApiGateway(TestCase):
 
         self.api_endpoint = api_outputs[0]["OutputValue"]
 
-    def test_api_gateway(self):
+    def test_api_gateway_delete(self):
         """
         Call the API Gateway endpoint and check the response
         """
-        response = requests.get(self.api_endpoint)
-        self.assertDictEqual(response.json(), {"message": "hello world"})
+        ret = requests.get(self.api_endpoint)
+
+        assert ret.status_code == 200
+        data = json.loads(ret.text)
+        assert data['delete count'] >= 0
+
+
+    def test_api_gateway_insert(self):
+        """
+        Call the API Gateway endpoint and check the response
+        """
+        ret = requests.get(self.api_endpoint, params={'action':'insert news'})
+
+        assert ret.status_code == 200
+        data = json.loads(ret.text)
+        assert data['insert count'] >= 0
+
+        inserted = data['insert count']
+        ret = requests.get(self.api_endpoint) #default is deletion
+        assert ret.status_code == 200
+        data = json.loads(ret.text)
+        assert data['delete count'] == inserted
+

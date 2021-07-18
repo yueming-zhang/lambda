@@ -12,16 +12,16 @@ from news_sentiment_app import app
 def test_news_find():
 
     ret = app.findNews()
+    assert ret > 0
+    # d = ret.json()
 
-    d = ret.json()
+    # assert d['status'] == 'ok', 'get news should return ok status'
+    # assert len(d['articles']) > 5, 'get news should return at least 5 news'
+    # newsTitle=d['articles'][0]['title']
+    # assert len(newsTitle), 'len (first news title) needs to be > 0'
 
-    assert d['status'] == 'ok', 'get news should return ok status'
-    assert len(d['articles']) > 5, 'get news should return at least 5 news'
-    newsTitle=d['articles'][0]['title']
-    assert len(newsTitle), 'len (first news title) needs to be > 0'
-
-    print(ret)
-    pass
+    # print(ret)
+    # pass
 
 
 
@@ -47,3 +47,4 @@ def test_news_crud():
     assert delRsp != None
     assert delRsp['ResponseMetadata']['HTTPStatusCode'] == 200
     
+

@@ -11,13 +11,26 @@ def lambda_handler(event, context):
     print("button pressed")
     print(event)
     print("just changing a print")
-    if event['action']=='insert news':
-        findNews()
+    action = 'delete'
+    if 'action' in event and event['action']=='insert news':
+        print("event[action]==insert news")
+        res = findNews()
+        action = 'insert'
+    elif 'queryStringParameters' in event and event['queryStringParameters'] != None:
+        print ('queryStringParameters are:')
+        print (event['queryStringParameters'])
+        if 'action' in event['queryStringParameters'] and event['queryStringParameters']['action'] == 'insert news':
+            print("insert news triggerred by query string")
+            res = findNews()
+            action = 'insert'
     else:
-        return deleteNews()
+        print("delete news")
+        res = deleteNews()
     
-    return 'End of News Sentiment IOT function'
-
+    return {
+        "statusCode": 200,
+        "body": json.dumps({f"{action} count": res})
+    }
 
 def deleteNews():
     dynamodb = boto3.resource('dynamodb')
@@ -51,12 +64,13 @@ def deleteDynamoItem(title, ts):
     ) 
     return delresponse
 
-def findNews():
+def findNews()->int:
     #News credit to newsapi.org
     #Fetch headlines using the API
     #IMPORTANT: Register in newsapi.org to get your own API key, it's super easy!
     response = requests.get("https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=ed8d29480a36453ca85bc7b5929a7426")
     d=response.json()
+    inserted = 0
     if (d['status']) == 'ok':
         for article in d['articles']:
             print(article['title'])
@@ -65,7 +79,8 @@ def findNews():
             sentiment=json.loads(getSentiment(newsTitle))
             print(sentiment['Sentiment'])
             insertDynamo(sentiment['Sentiment'],newsTitle,timestamp)
-    return response
+            inserted += 1
+    return inserted
 
 #getSentiment function calls AWS Comprehend to get the sentiment
 def getSentiment(newsTitle):

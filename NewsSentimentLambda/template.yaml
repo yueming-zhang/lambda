@@ -8,7 +8,7 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 30
 
 Resources:
   NewsFunction:
@@ -17,6 +17,12 @@ Resources:
       CodeUri: news_sentiment_app/
       Handler: app.lambda_handler
       Runtime: python3.8
+      Policies:
+        - AmazonS3FullAccess 
+        - AmazonDynamoDBFullAccess 
+        - ComprehendFullAccess 
+        - AWSLambdaBasicExecutionRole 
+
       Events:
         News:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
