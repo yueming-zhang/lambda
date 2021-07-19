@@ -6,6 +6,6 @@ codeuri = "/home/ming/Documents/lambda/NewsSentimentLambda/news_sentiment_app"
 runtime = "python3.8"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["NewsFunction"]
+functions = ["NewsFunction", "SentimentFunction"]
 
 [layer_build_definitions]

@@ -5,7 +5,7 @@ sys.path.insert(0,parentdir)
 
 import json
 import pytest
-from news_sentiment_app import app
+from news_sentiment_app import app, query
 
 
 @pytest.fixture()
@@ -86,3 +86,19 @@ def test_lambda_news_delete2():
 
     assert ret['statusCode'] == 200
     assert data['delete count'] == 0
+
+
+def test_get_by_sentiment():
+    #insert some news
+    ret = app.lambda_handler({'action':'insert news'}, "")
+
+    ret = query.lambda_handler({'sentiment':'NEUTRAL'}, "")
+
+    assert ret.status_code == 200
+    ret = json.loads(ret.text)
+
+    assert ret['ResponseMetadata']['HTTPStatusCode'] == 200
+    assert 'Items' in ret
+    assert len(ret['Items']) > 0
+
+    assert ret['Items'][0]['sentiment'] == 'NEUTRAL'

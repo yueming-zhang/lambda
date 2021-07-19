@@ -5,7 +5,7 @@ sys.path.insert(0,parentdir)
 
 import json
 import pytest
-from news_sentiment_app import app
+from news_sentiment_app import app, query
 
 
 
@@ -25,7 +25,7 @@ def test_news_find():
 
 
 
-def test_setment_get():
+def test_determine_sentiment():
 
     ret = app.getSentiment('the bitcoin is doing great')
     res = json.loads(ret)

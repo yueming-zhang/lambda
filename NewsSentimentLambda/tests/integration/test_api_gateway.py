@@ -48,6 +48,10 @@ class TestApiGateway(TestCase):
 
         self.api_endpoint = api_outputs[0]["OutputValue"]
 
+        api_outputs = [output for output in stack_outputs if output["OutputKey"] == "SentimentApi"]
+        self.assertTrue(api_outputs, f"Cannot find output NewsApi in stack {stack_name}")
+        self.api_endpoint_get_sentiment = api_outputs[0]["OutputValue"]
+
     def test_api_gateway_delete(self):
         """
         Call the API Gateway endpoint and check the response
@@ -75,3 +79,14 @@ class TestApiGateway(TestCase):
         data = json.loads(ret.text)
         assert data['delete count'] == inserted
 
+    def test_api_gateway_get_sentiment(self):
+        """
+        Call the API Gateway endpoint and check the response
+        """
+        ret = requests.get(self.api_endpoint_get_sentiment, params={'sentiment':'NEGATIVE'})
+
+        assert ret.status_code == 200
+        data = json.loads(ret.text)
+        assert 'Items' in data
+        assert data
+        assert data['ResponseMetadata']['HTTPStatusCode'] == 200

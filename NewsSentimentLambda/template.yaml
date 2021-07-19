@@ -34,8 +34,34 @@ Resources:
           Properties:
             Description: Cloudwatch schedule trigger lambda
             Name: FindNewsScheduler
-            Schedule: rate(5 minutes)       
-            Input: '[{"action":"insert news"}]'
+            Schedule: rate(6 hours)       
+            Input: '{"action":"insert news"}'
+
+  SentimentFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: news_sentiment_app/
+      Handler: query.lambda_handler
+      Runtime: python3.8
+      Policies:
+        - AmazonS3FullAccess 
+        - AmazonDynamoDBFullAccess 
+        - AWSLambdaBasicExecutionRole 
+
+      Events:
+        Sentiment:
+          Type: Api 
+          Properties:
+            Path: /sentiment
+            Method: get
+            RestApiId: !Ref SentimentApi
+
+  SentimentApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: SentimentApi
+      Description: SentimentApi
+      StageName: Prod
 
   DynamoNewsTable:
     Type: AWS::DynamoDB::Table
@@ -49,6 +75,9 @@ Resources:
           AttributeName: "timestamp"
           AttributeType: "S"
 
+        - 
+          AttributeName: "sentiment"
+          AttributeType: "S"
 
       KeySchema:
         - 
@@ -58,6 +87,21 @@ Resources:
           AttributeName: "timestamp"
           KeyType: "RANGE"
       
+      GlobalSecondaryIndexes:
+        - 
+          ContributorInsightsSpecification: 
+            Enabled: true
+          IndexName: "sentiment-index"
+          KeySchema: 
+            - 
+              AttributeName: "sentiment" 
+              KeyType: "HASH"
+          Projection: 
+            ProjectionType: "ALL"
+          ProvisionedThroughput: 
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
@@ -70,9 +114,16 @@ Outputs:
   NewsApi:
     Description: "API Gateway endpoint URL for Prod stage for News function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/news/"
+  SentimentApi:
+    Description: "API Gateway endpoint URL for Prod stage for News function"
+    Value: !Sub "https://${SentimentApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/sentiment/"
   NewsFunction:
     Description: "News Lambda Function ARN"
     Value: !GetAtt NewsFunction.Arn
+  SentimentFunction:
+    Description: "Get Sentiment"
+    Value: !GetAtt SentimentFunction.Arn
+
   NewsFunctionIamRole:
     Description: "Implicit IAM Role created for News function"
     Value: !GetAtt NewsFunctionRole.Arn
