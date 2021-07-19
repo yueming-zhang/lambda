@@ -94,8 +94,8 @@ def test_get_by_sentiment():
 
     ret = query.lambda_handler({'sentiment':'NEUTRAL'}, "")
 
-    assert ret.status_code == 200
-    ret = json.loads(ret.text)
+    assert ret['statusCode'] == 200
+    ret = json.loads(ret['body'])
 
     assert ret['ResponseMetadata']['HTTPStatusCode'] == 200
     assert 'Items' in ret
